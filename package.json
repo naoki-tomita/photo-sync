@@ -1,0 +1,21 @@
+{
+  "name": "photo-sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/open": "^6.2.1",
+    "@types/sharp": "^0.27.1",
+    "node-fetch": "^2.6.1",
+    "open": "^8.0.3",
+    "sharp": "^0.27.2",
+    "ts-node": "^9.1.1"
+  },
+  "scripts": {
+    "dev": "parcel index.html -p 12345"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.5.8",
+    "typescript": "^4.2.3"
+  }
+}

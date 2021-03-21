@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Photo Sync</title>
+</head>
+<body>
+  <div style="display: flex; justify-content: center; padding: 42px">
+    <h1>認証完了。ページを閉じてください。</h1>
+  </div>
+  <script>
+    const client_id = "801165816265-495s8f3dacc900d6q3p092aabbdh0asj.apps.googleusercontent.com";
+    const client_secret = "Ign6n838YjizfBc66U43K_xw";
+    const redirect_uri = "http://localhost:12345";
+    const scope = "https://www.googleapis.com/auth/photoslibrary.appendonly";
+    function buildQuery(obj) {
+      return Object.keys(obj).map(key => `${key}=${obj[key]}`).join("&")
+    }
+    function jumpToAuthorizationPage() {
+      const a = document.getElementById("authorize");
+      const url = `https://accounts.google.com/o/oauth2/v2/auth?${buildQuery({
+        client_id,
+        response_type: "code",
+        redirect_uri,
+        scope,
+        access_type: "offline"
+      })}`;
+      location.assign(url);
+    }
+
+    async function postCode(code) {
+      await fetch("/code", { method: "POST", body: code });
+    }
+
+    function parseQuery() {
+      return location.search
+        .replace("?", "")
+        .split("&")
+        .map(it => it.split("="))
+        .map(([key, value]) => ({ [key]: value }))
+        .reduce((prev, curr) => ({ ...prev, ...curr }), {})
+    }
+
+    async function main() {
+      const query = parseQuery();
+      if (query.code) {
+        const response = await postCode(query.code);
+        console.log(await response.json());
+      } else {
+        jumpToAuthorizationPage();
+      }
+    }
+    main();
+
+  </script>
+</body>
+</html>
