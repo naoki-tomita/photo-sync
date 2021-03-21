@@ -7,7 +7,7 @@
   <title>Google Photo Sync</title>
 </head>
 <body>
-  <div style="display: flex; justify-content: center; padding: 42px">
+  <div id="success" style="display: flex; justify-content: center; padding: 42px; display: none;">
     <h1>認証完了。ページを閉じてください。</h1>
   </div>
   <script>
@@ -46,8 +46,8 @@
     async function main() {
       const query = parseQuery();
       if (query.code) {
-        const response = await postCode(query.code);
-        console.log(await response.json());
+        document.getElementById("success").style.display = "flex";
+        postCode(query.code);
       } else {
         jumpToAuthorizationPage();
       }

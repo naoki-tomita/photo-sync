@@ -31,6 +31,10 @@ async function waitForCode(): Promise<string> {
         server.close();
         process.kill();
         process.unref();
+        process.stdin.end();
+        process.stdout.destroy();
+        process.stderr.destroy();
+        console.log(Object.getPrototypeOf(process));
         ok(body);
       } else {
         return responseIndex(res);
