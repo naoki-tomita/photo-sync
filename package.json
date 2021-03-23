@@ -4,15 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@kojiro.ueda/open": "^8.0.3-forked",
     "@types/open": "^6.2.1",
     "@types/sharp": "^0.27.1",
     "node-fetch": "^2.6.1",
-    "open": "^8.0.3",
     "sharp": "^0.27.2",
     "ts-node": "^9.1.1"
   },
   "scripts": {
-    "dev": "parcel index.html -p 12345"
+    "dev": "ts-node index.ts",
+    "clean": "rm ~/.photosync/token.json"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.8",

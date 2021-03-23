@@ -1,8 +1,7 @@
 import { createServer, ServerResponse, IncomingMessage } from "http";
 import { readFile, mkdir, writeFile } from "fs/promises";
 import fetch from "node-fetch";
-import * as open from "open";
-import * as sharp from "sharp";
+import open, { apps } from "@kojiro.ueda/open";
 
 const HomeDir = process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
 
@@ -29,17 +28,24 @@ async function waitForCode(): Promise<string> {
         res.writeHead(200).end();
         const body = await parseBody(req);
         server.close();
-        process.kill();
-        process.unref();
-        process.stdin.end();
-        process.stdout.destroy();
-        process.stderr.destroy();
-        console.log(Object.getPrototypeOf(process));
+        process.kill("SIGKILL");
         ok(body);
       } else {
         return responseIndex(res);
       }
-    }).listen(12345, async () => (process = await open("http://localhost:12345", { allowNonzeroExitCode: true })));
+    }).listen(12345, async () => (
+      console.log("Open http://localhost:12345"),
+      process = await open(
+        "",
+        {
+          app: {
+            name: ["google chrome", "google chrome canary"],
+            arguments: ["http://localhost:12345", "--incognito"]
+          },
+          cliArguments: ["-n"]
+        }
+      )
+    ));
   });
 }
 
@@ -47,17 +53,18 @@ const client_id = "801165816265-495s8f3dacc900d6q3p092aabbdh0asj.apps.googleuser
 const client_secret = "Ign6n838YjizfBc66U43K_xw";
 const redirect_uri = "http://localhost:12345";
 
-function buildQuery(obj: {[key: string]: string}) {
-  return Object.keys(obj).map(key => `${key}=${obj[key]}`).join("&")
+function buildQuery(obj: {[key: string]: string | undefined}) {
+  return Object.keys(obj).filter(key => !!obj[key]).map(key => `${key}=${obj[key]}`).join("&")
 }
 
-function requestAccessTokenByCode(code: string): Promise<AccessToken> {
+function requestAccessToken(grant_type: "authorization_code" | "refresh_token", value: string) {
   return fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: buildQuery({
-      code,
-      grant_type: "authorization_code",
+      code: grant_type === "authorization_code" ? value: undefined,
+      refresh_token: grant_type === "refresh_token" ? value: undefined,
+      grant_type,
       client_id,
       client_secret,
       redirect_uri,
@@ -65,17 +72,12 @@ function requestAccessTokenByCode(code: string): Promise<AccessToken> {
   }).then(async it => it.ok ? it.json() : throwError(await it.text()));
 }
 
-function requestAccessTokenByRefreshToken(refresh_token: string): Promise<AccessToken> {
-  return fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: buildQuery({
-      refresh_token,
-      grant_type: "refresh_token",
-      client_id,
-      client_secret,
-    }),
-  }).then(async it => it.ok ? { ...await it.json(), refresh_token } : throwError(await it.text()));
+function requestAccessTokenByCode(code: string): Promise<AccessToken> {
+  return requestAccessToken("authorization_code", code);
+}
+
+function requestAccessTokenByRefreshToken(refreshToken: string): Promise<AccessToken> {
+  return requestAccessToken("refresh_token", refreshToken);
 }
 
 function throwError(e: string): any {

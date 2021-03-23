@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@kojiro.ueda/open@^8.0.3-forked":
+  version "8.0.3-forked"
+  resolved "https://registry.yarnpkg.com/@kojiro.ueda/open/-/open-8.0.3-forked.tgz#6b3f354c38e7656f7690ce93335789a7523529fd"
+  integrity sha512-XviK0KLlkYPEPKHS4HPKip1EgMJPED3V2XjkOhE7uQwLcXpA49llvylpUg0Y529UeCQTYQcY9UqTE/WGkCa2vA==
+  dependencies:
+    define-lazy-prop "^2.0.0"
+    is-docker "^2.1.1"
+    is-wsl "^2.2.0"
+
 "@types/node-fetch@^2.5.8":
   version "2.5.8"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.5.8.tgz#e199c835d234c7eb0846f6618012e558544ee2fb"
@@ -400,7 +409,7 @@ once@^1.3.1, once@^1.4.0:
   dependencies:
     wrappy "1"
 
-open@*, open@^8.0.3:
+open@*:
   version "8.0.3"
   resolved "https://registry.yarnpkg.com/open/-/open-8.0.3.tgz#04f4406c950666c35041aad8a621700022116afd"
   integrity sha512-7nsHNw3rOIPTwhF5iYkgE+LVM/oUHWC3cgrWNxPqa+W+Wl5Ekvo32qayB5PYX8zNjXzUkrTaJsWpaGmuw8Aspg==
