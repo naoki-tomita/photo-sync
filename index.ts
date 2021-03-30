@@ -1,7 +1,8 @@
 import { createServer, ServerResponse, IncomingMessage } from "http";
-import { readFile, mkdir, writeFile } from "fs/promises";
+import { readFile, mkdir, writeFile, readdir, stat } from "fs/promises";
 import fetch from "node-fetch";
 import open, { apps } from "@kojiro.ueda/open";
+import { join, extname } from "path";
 
 const HomeDir = process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
 
@@ -112,9 +113,22 @@ async function getAccessToken() {
   }
 }
 
+async function recursiveFindFiles(root: string, exts: string[]): Promise<string[]> {
+  const dirOrFiles = await readdir(root);
+  return Promise.all(dirOrFiles
+    .map(dirOrFile => join(root, dirOrFile))
+    .map(async path =>
+      stat(path).then(status =>
+        status.isDirectory()
+          ? recursiveFindFiles(path, exts)
+          : exts.includes(extname(path)) ? [path] : []))
+  ).then(result => result.flat());
+}
+
 async function main() {
   const accessToken = await getAccessToken().then(cacheToken);
-  console.log(accessToken);
+  const files = await recursiveFindFiles("/Volumes/Untitled/pics", [".jpg", ".jpeg", ".png"]);
+
   // const image = sharp("TEST.JPG");
   // await image
   //   .metadata()
